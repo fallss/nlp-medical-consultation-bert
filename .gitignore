@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Large Datasets (>100MB exceeds standard GitHub push limit)
+# Gunakan Git LFS jika ingin push dataset, atau download dari link sumber
+ai-medical-chatbot.csv
+bert_medical_assets.zip
+
+# Streamlit config / cache
+.streamlit/secrets.toml
+
+# Operating System Files
+.DS_Store
+Thumbs.db
