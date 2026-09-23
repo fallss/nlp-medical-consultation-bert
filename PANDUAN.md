@@ -40,6 +40,7 @@ chatbot/
 ├── requirements.txt                # Dependensi paket Python yang dibutuhkan
 ├── README.md                       # Dokumentasi publik repositori GitHub
 ├── PANDUAN.md                      # Panduan teknis lengkap (file ini)
+├── knowledge_base.csv              # Basis data 3.900+ Q&A dokter-pasien siap pakai (TF-IDF out-of-the-box)
 ├── app.py                          # Aplikasi Web Streamlit (Dual-Engine Dashboard)
 ├── medical_chatbot_bert.ipynb      # Notebook Colab (Training BERT + UI Gradio)
 │
@@ -47,7 +48,6 @@ chatbot/
     ├── bert_medical_model/         # Folder weights PyTorch BERT Transformer
     ├── label_encoder.pkl           # Encoder 12 kelas spesialisasi medis
     ├── kb_embeddings.npy           # Vektor dense embeddings Sentence-BERT
-    ├── knowledge_base.csv          # Basis pengetahuan Q&A hasil pra-pemrosesan
     └── model_metadata.json         # Laporan evaluasi & akurasi pengujian model
 ```
 

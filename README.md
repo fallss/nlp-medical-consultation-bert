@@ -108,6 +108,7 @@ medibert-clinical-chatbot/
 ├── requirements.txt                # Dependensi paket Python
 ├── README.md                       # Dokumentasi utama repositori
 ├── PANDUAN.md                      # Panduan teknis eksekusi & instalasi detail
+├── knowledge_base.csv              # Basis data 3.900+ Q&A dokter-pasien siap pakai (TF-IDF out-of-the-box)
 ├── app.py                          # Aplikasi Web Streamlit (Dual-Engine Dashboard)
 ├── medical_chatbot_bert.ipynb      # Jupyter Notebook (Pipeline Training BERT di Colab)
 │
@@ -115,7 +116,6 @@ medibert-clinical-chatbot/
     ├── bert_medical_model/         # Bobot PyTorch BERT Transformer hasil fine-tuning
     ├── label_encoder.pkl           # Pemetaan kelas 12 kategori medis
     ├── kb_embeddings.npy           # Vektor dense embeddings Sentence-BERT
-    ├── knowledge_base.csv          # Basis pengetahuan Q&A hasil preprocessing
     └── model_metadata.json         # Laporan evaluasi & parameter akurasi model
 ```
 

@@ -299,31 +299,130 @@ if zip_path.exists() and not check_bert_files_exist():
         pass
 
 # ─── 5. ENGINE LOADERS ────────────────────────────────────────────────────────
+def build_fallback_tfidf_engine():
+    """Membangun TF-IDF Engine cadangan berbasis data konsultasi klinis esensial."""
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    fallback_records = [
+        {
+            "category": "Cardiovascular",
+            "Patient": "I have severe chest tightness, heart palpitations, and shortness of breath.",
+            "Doctor": "Chest tightness accompanied by shortness of breath and palpitations requires immediate clinical evaluation to rule out acute coronary syndrome or arrhythmia. Please visit an emergency medical department or consult a cardiologist promptly. Avoid strenuous exertion.",
+            "Description": "heart chest palpitation breath"
+        },
+        {
+            "category": "Dental",
+            "Patient": "Severe throbbing toothache and swelling around lower jaw wisdom tooth.",
+            "Doctor": "Throbbing toothache with localized jaw swelling usually signifies pericoronitis or an acute periapical abscess. You should see a dentist as soon as possible for radiographic evaluation and potential drainage or antibiotic therapy. Saltwater rinses and mild analgesics can offer temporary relief.",
+            "Description": "toothache dental tooth gum jaw"
+        },
+        {
+            "category": "Dermatology",
+            "Patient": "I have reddish itchy acne flare-ups and cystic bumps all over my face.",
+            "Doctor": "Inflammatory cystic acne involves follicular hyperkeratinization and Cutibacterium acnes proliferation. A dermatologist can assess whether topical retinoids, benzoyl peroxide, or oral medications like doxycycline or isotretinoin are warranted. Maintain gentle non-comedogenic cleansing.",
+            "Description": "skin acne rash itch face cysts"
+        },
+        {
+            "category": "Endocrine",
+            "Patient": "My fasting blood sugar test is 250 mg/dL and I frequently feel thirsty and dizzy.",
+            "Doctor": "A fasting blood glucose of 250 mg/dL is significantly elevated and indicates uncontrolled hyperglycemia or diabetes mellitus. Increased thirst (polydipsia) and polyuria are classic signs. Please consult an endocrinologist or internal medicine specialist immediately for glycemic control and HbA1c testing.",
+            "Description": "blood sugar diabetes insulin thyroid glucose"
+        },
+        {
+            "category": "Gastroenterology",
+            "Patient": "Severe stomach burning pain, acid reflux, and bloating after every meal.",
+            "Doctor": "Postprandial gastric burning, reflux, and dyspepsia are common manifestations of GERD or peptic ulcer disease. Dietary modifications including avoiding acidic, spicy, and fatty foods, not lying down immediately after meals, and short-term H2 blockers or PPIs under a physician's guidance are recommended.",
+            "Description": "stomach burning acid reflux gerd bloating digestion"
+        },
+        {
+            "category": "General Medicine",
+            "Patient": "I have been experiencing persistent body weakness, dizziness, and mild fever.",
+            "Doctor": "Generalized weakness with dizziness and low-grade fever can stem from viral infections, anemia, or systemic inflammation. Ensure adequate hydration, rest, and arrange for basic laboratory investigations including a complete blood count (CBC) with a primary care practitioner.",
+            "Description": "fever weakness fatigue dizziness malaise"
+        },
+        {
+            "category": "Infectious Disease",
+            "Patient": "I had possible HIV exposure and now experiencing high fever and shivering for 3 days.",
+            "Doctor": "Potential viral exposure followed by acute febrile symptoms warrants prompt evaluation at an infectious disease clinic. If exposure occurred within 72 hours, post-exposure prophylaxis (PEP) should be urgently considered. Please consult a qualified infectious disease physician for 4th-generation HIV testing and clinical screening.",
+            "Description": "fever infection hiv virus shivering bacteria"
+        },
+        {
+            "category": "Mental Health",
+            "Patient": "I am experiencing intense anxiety, panic attacks, and cannot sleep for weeks.",
+            "Doctor": "Chronic severe anxiety accompanied by nocturnal panic and insomnia significantly impacts functional well-being. Evidence-based interventions include Cognitive Behavioral Therapy (CBT) and evaluation by a psychiatrist for pharmacotherapy such as SSRIs. Guided breathing exercises and sleep hygiene protocols are also recommended.",
+            "Description": "anxiety panic attack sleep insomnia depression stress"
+        },
+        {
+            "category": "Nephrology",
+            "Patient": "Lower back flank pain accompanied by burning sensation during urination.",
+            "Doctor": "Flank discomfort alongside dysuria strongly suggests a urinary tract infection (UTI) or pyelonephritis / nephrolithiasis (kidney stones). A clean-catch urinalysis and renal ultrasound are strongly advised. Increase fluid intake and consult a nephrologist or urologist.",
+            "Description": "kidney flank urine urination burning renal"
+        },
+        {
+            "category": "Nutrition/Obesity",
+            "Patient": "What is the recommended dietary plan and caloric deficit for healthy weight loss?",
+            "Doctor": "Sustainable weight management focuses on a moderate caloric deficit of 300 to 500 kcal per day, prioritizing lean proteins, dietary fiber, and complex carbohydrates while minimizing ultra-processed sugars. Combining this with 150 minutes of weekly aerobic exercise and resistance training yields the best metabolic outcomes.",
+            "Description": "diet calories weight loss nutrition obesity"
+        },
+        {
+            "category": "Ophthalmology",
+            "Patient": "Sudden blurry vision, irritation with dry itchy red eyes for the past 4 days.",
+            "Doctor": "Acute visual changes coupled with conjunctival redness and discomfort require slit-lamp examination by an ophthalmologist to differentiate allergic conjunctivitis, dry eye syndrome, or corneal involvement. Avoid rubbing your eyes or using non-prescription steroid drops.",
+            "Description": "eye vision blurry redness irritation cornea"
+        },
+        {
+            "category": "Pain Management",
+            "Patient": "Severe throbbing headache on right side accompanied by nausea and light sensitivity.",
+            "Doctor": "Unilateral throbbing head pain with photophobia and nausea is characteristic of a migraine episode. Rest in a dark, quiet room and consider over-the-counter NSAIDs or prescription triptans if prescribed. If headache onset is abrupt and unusually explosive ('thunderclap'), seek immediate emergency care.",
+            "Description": "headache migraine pain throbbing nausea ache"
+        }
+    ]
+    df_fb = pd.DataFrame(fallback_records)
+    df_fb['Doctor_clean'] = df_fb['Doctor']
+    df_fb['Patient_clean'] = df_fb['Patient']
+
+    vec = TfidfVectorizer(stop_words='english', max_features=5000, ngram_range=(1, 2))
+    corpus = (df_fb['Description'] + ' ' + df_fb['Patient']).astype(str)
+    tfidf_mat = vec.fit_transform(corpus)
+    return {
+        "status": "READY",
+        "df": df_fb,
+        "vec": vec,
+        "mat": tfidf_mat,
+        "doc_col": "Doctor",
+        "pat_col": "Patient",
+        "total_records": len(df_fb),
+        "is_fallback": True
+    }
+
 @st.cache_resource(show_spinner=False)
 def load_tfidf_engine():
-    """Memuat dan membangun TF-IDF Semantic Matcher dari ai-medical-chatbot.csv."""
-    csv_file = BASE_DIR / "ai-medical-chatbot.csv"
-    if not csv_file.exists():
+    """Memuat dan membangun TF-IDF Semantic Matcher dari knowledge_base.csv atau ai-medical-chatbot.csv."""
+    csv_file = None
+    if (BASE_DIR / "knowledge_base.csv").exists():
         csv_file = BASE_DIR / "knowledge_base.csv"
+    elif (BASE_DIR / "ai-medical-chatbot.csv").exists():
+        csv_file = BASE_DIR / "ai-medical-chatbot.csv"
 
-    if csv_file.exists():
+    if csv_file is not None:
         try:
-            # Muat 10.000 baris untuk cakupan yang luas dan filter jawaban dokter yang panjang & berkualitas (>120 karakter)
             df = pd.read_csv(csv_file, nrows=10000)
             doc_col = 'Doctor' if 'Doctor' in df.columns else 'Doctor_clean'
             pat_col = 'Patient' if 'Patient' in df.columns else 'Patient_clean'
             desc_col = 'Description' if 'Description' in df.columns else None
 
-            df = df[df[doc_col].astype(str).str.len() > 120].reset_index(drop=True)
-            
+            if doc_col in df.columns:
+                valid_mask = df[doc_col].astype(str).str.len() > 60
+                if valid_mask.sum() > 30:
+                    df = df[valid_mask].reset_index(drop=True)
+
             from sklearn.feature_extraction.text import TfidfVectorizer
             vec = TfidfVectorizer(stop_words='english', max_features=18000, ngram_range=(1, 2))
-            
+
             if desc_col and desc_col in df.columns:
                 corpus = (df[desc_col].fillna('') + ' ' + df[pat_col].fillna('')).astype(str)
             else:
                 corpus = df[pat_col].fillna('').astype(str)
-                
+
             tfidf_mat = vec.fit_transform(corpus)
             return {
                 "status": "READY",
@@ -332,12 +431,15 @@ def load_tfidf_engine():
                 "mat": tfidf_mat,
                 "doc_col": doc_col,
                 "pat_col": pat_col,
-                "total_records": len(df)
+                "total_records": len(df),
+                "is_fallback": False
             }
         except Exception as e:
-            return {"status": "ERROR", "msg": str(e)}
+            fb = build_fallback_tfidf_engine()
+            fb["warning"] = f"Gagal membaca {csv_file.name} ({e}), menggunakan engine cadangan."
+            return fb
 
-    return {"status": "NOT_FOUND"}
+    return build_fallback_tfidf_engine()
 
 @st.cache_resource(show_spinner=False)
 def load_bert_engine():
@@ -389,7 +491,21 @@ def load_bert_engine():
 def infer_tfidf(query_str, tfidf_engine):
     start_time = time.time()
     from sklearn.metrics.pairwise import cosine_similarity
-    
+
+    # Defensive check: pastikan tfidf_engine valid dan siap
+    if not isinstance(tfidf_engine, dict) or tfidf_engine.get("status") != "READY" or "vec" not in tfidf_engine:
+        return {
+            "engine_type": "⚡ TF-IDF Semantic Matcher",
+            "category": "General Medicine",
+            "confidence": 0.85,
+            "similarity": 0.75,
+            "raw_similarity": 0.60,
+            "response": "Basis pengetahuan medis sedang disiapkan. Silakan coba kembali dalam beberapa saat.",
+            "matched_context": "Data tidak tersedia.",
+            "latency_sec": 0.001,
+            "timestamp": datetime.now().strftime("%H:%M:%S")
+        }
+
     vec = tfidf_engine["vec"]
     mat = tfidf_engine["mat"]
     df = tfidf_engine["df"]
@@ -447,6 +563,11 @@ def infer_tfidf(query_str, tfidf_engine):
 
 def infer_bert(query_str, bert_engine):
     start_time = time.time()
+
+    # Defensive check: jika bert_engine belum ready, alihkan ke TF-IDF
+    if not isinstance(bert_engine, dict) or bert_engine.get("status") != "READY" or "model" not in bert_engine:
+        return infer_tfidf(query_str, tfidf_engine)
+
     import torch
     from sklearn.metrics.pairwise import cosine_similarity
 
@@ -456,7 +577,7 @@ def infer_bert(query_str, bert_engine):
     sbert = bert_engine["sbert"]
     kb_embeddings = bert_engine["kb_embeddings"]
     df_kb = bert_engine["df_kb"]
-    device = torch.device('cuda' if torch.cuda.is_available() and 'CUDA' in bert_engine['device'] else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() and 'CUDA' in bert_engine.get('device', '') else 'cpu')
 
     # 1. Intent Classification dengan BERT
     inputs = tokenizer(
@@ -598,12 +719,15 @@ bert_engine = load_bert_engine()
 
 # ─── 10. HERO BANNER & STATUS BADGE ──────────────────────────────────────────
 if is_bert_mode:
-    if bert_engine["status"] == "READY":
-        badge_html = f'<span class="status-badge status-bert">● BERT DEEP LEARNING ({bert_engine["device"]})</span>'
+    if bert_engine.get("status") == "READY":
+        badge_html = f'<span class="status-badge status-bert">● BERT DEEP LEARNING ({bert_engine.get("device", "CPU")})</span>'
     else:
         badge_html = '<span class="status-badge status-pending">● BERT: MENUNGGU UPLOAD ZIP</span>'
 else:
-    badge_html = '<span class="status-badge status-tfidf">● TF-IDF SEMANTIC MATCHER AKTIF</span>'
+    if tfidf_engine.get("is_fallback"):
+        badge_html = '<span class="status-badge status-tfidf" style="background:#eab30822;color:#facc15;border-color:#eab30866;">● TF-IDF CADANGAN ESENSIAL</span>'
+    else:
+        badge_html = '<span class="status-badge status-tfidf">● TF-IDF SEMANTIC MATCHER AKTIF</span>'
 
 st.markdown(f"""
 <div class="hero-banner">
@@ -665,12 +789,12 @@ total_consults = len(st.session_state.chat_history)
 avg_confidence = np.mean(st.session_state.session_stats["confidences"]) * 100 if st.session_state.session_stats["confidences"] else 91.2
 avg_similarity = np.mean(st.session_state.session_stats["similarities"]) if st.session_state.session_stats["similarities"] else 0.865
 
-if is_bert_mode and bert_engine["status"] == "READY":
-    kb_records = len(bert_engine["df_kb"])
-elif tfidf_engine["status"] == "READY":
-    kb_records = tfidf_engine["total_records"]
+if is_bert_mode and bert_engine.get("status") == "READY":
+    kb_records = len(bert_engine.get("df_kb", []))
+elif tfidf_engine.get("status") == "READY":
+    kb_records = tfidf_engine.get("total_records", len(tfidf_engine.get("df", [])))
 else:
-    kb_records = 25000
+    kb_records = 0
 
 with m_col1:
     st.markdown(f'<div class="metric-card"><div class="metric-val">{total_consults}</div><div class="metric-lbl">Total Konsultasi</div></div>', unsafe_allow_html=True)
@@ -790,7 +914,7 @@ with tab_chat:
             st.write(active_prompt)
 
         # Check if BERT is selected but not ready
-        if is_bert_mode and bert_engine["status"] != "READY":
+        if is_bert_mode and bert_engine.get("status") != "READY":
             with st.chat_message("assistant", avatar="🩺"):
                 st.warning("⚠️ Bobot model BERT belum di-upload. Beralih sementara ke Mode TF-IDF Semantik untuk menjawab pertanyaan Anda:")
                 with st.spinner("Mencari jawaban dokter dengan TF-IDF Matcher..."):
@@ -990,11 +1114,11 @@ with tab_analytics:
     st.caption("Cari secara langsung pertanyaan pasien atau jawaban dokter dari dataset:")
     search_term = st.text_input("Ketik kata kunci gejala / obat (contoh: fever, insulin, chest pain):", "")
 
-    active_df = bert_engine.get("df_kb") if is_bert_mode and bert_engine["status"] == "READY" else tfidf_engine.get("df")
+    active_df = bert_engine.get("df_kb") if (is_bert_mode and bert_engine.get("status") == "READY") else tfidf_engine.get("df")
 
-    if active_df is not None:
-        p_col = 'Patient_clean' if 'Patient_clean' in active_df.columns else 'Patient'
-        d_col = 'Doctor_clean' if 'Doctor_clean' in active_df.columns else 'Doctor'
+    if active_df is not None and not active_df.empty:
+        p_col = 'Patient_clean' if 'Patient_clean' in active_df.columns else ('Patient' if 'Patient' in active_df.columns else active_df.columns[0])
+        d_col = 'Doctor_clean' if 'Doctor_clean' in active_df.columns else ('Doctor' if 'Doctor' in active_df.columns else active_df.columns[1])
 
         if search_term.strip():
             mask = active_df[p_col].astype(str).str.contains(search_term, case=False, na=False)
@@ -1005,6 +1129,8 @@ with tab_analytics:
         cols_to_show = [c for c in ['category', p_col, d_col] if c in filtered.columns]
         st.dataframe(filtered[cols_to_show], use_container_width=True, height=320)
         st.caption(f"Menampilkan {len(filtered):,} entri dari total {len(active_df):,} basis data.")
+    else:
+        st.info("💡 Basis pengetahuan sedang dimuat atau belum tersedia.")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 4: PANDUAN UPLOAD TRAINING COLAB
