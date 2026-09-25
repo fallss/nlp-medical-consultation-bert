@@ -1,5 +1,6 @@
 # 🏥 MediBERT: Dual-Engine NLP Medical Consultation Chatbot
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://nlp-medical-consultation-bert-nxw2ek6szrqy9rtgd8q4s5.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/UI-Streamlit-FF4B4B.svg?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![Transformers](https://img.shields.io/badge/HuggingFace-Transformers-FFD21E.svg?style=flat&logo=huggingface&logoColor=black)](https://huggingface.co/)
@@ -7,11 +8,15 @@
 [![Course](https://img.shields.io/badge/Academic-NLP%20Semester%207-10B981.svg?style=flat)](#)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg?style=flat)](LICENSE)
 
+> 🌐 **Live Demo Aplikasi**: [Buka MediBERT di Streamlit Cloud](https://nlp-medical-consultation-bert-nxw2ek6szrqy9rtgd8q4s5.streamlit.app/)  
+> *(Aplikasi telah aktif di-deploy dan dapat dicoba secara publik langsung melalui browser tanpa instalasi lokal)*
+
 > **MediBERT** adalah sistem konsultasi dan asisten medis cerdas berbasis **Natural Language Processing (NLP)** yang dirancang untuk mengklasifikasikan keluhan pasien ke dalam **12 spesialisasi medis klinis** dan menyajikan rekomendasi penanganan dokter terverifikasi. Dilengkapi dengan **Dual-Engine Architecture** yang fleksibel (Fine-Tuned BERT Neural Network & TF-IDF Semantic Matcher).
 
 ---
 
 ## 📑 Daftar Isi
+- [🌐 Live Demo Aplikasi (Streamlit Cloud)](#-live-demo-aplikasi-streamlit-cloud)
 - [✨ Fitur Utama](#-fitur-utama)
 - [🏗️ Arsitektur Dual-Engine](#️-arsitektur-dual-engine)
 - [🗂️ 12 Spesialisasi Medis](#️-12-spesialisasi-medis)
@@ -23,6 +28,19 @@
   - [3. Menghubungkan Hasil Training ke Streamlit](#3-menghubungkan-hasil-training-ke-streamlit)
 - [⚙️ Tech Stack & Library](#️-tech-stack--library)
 - [⚠️ Peringatan Medis (Medical Disclaimer)](#️-peringatan-medis-medical-disclaimer)
+
+---
+
+## 🌐 Live Demo Aplikasi (Streamlit Cloud)
+
+Aplikasi **MediBERT** kini telah dideploy di **Streamlit Community Cloud** dan siap diakses secara publik:
+
+| Fitur | Informasi / Tautan |
+|:---|:---|
+| 🔗 **Tautan Langsung** | **[nlp-medical-consultation-bert-nxw2ek6szrqy9rtgd8q4s5.streamlit.app](https://nlp-medical-consultation-bert-nxw2ek6szrqy9rtgd8q4s5.streamlit.app/)** |
+| 🟢 **Status Server** | **Online & Siap Digunakan** |
+| 📱 **Kompatibilitas** | Responsif untuk Desktop, Tablet, dan Smartphone |
+| ⚡ **Mode Default** | **TF-IDF Semantic Engine** (Responsif tanpa beban GPU) |
 
 ---
 
@@ -127,8 +145,8 @@ medibert-clinical-chatbot/
 
 1. **Clone repositori ini:**
    ```bash
-   git clone https://github.com/username-anda/medibert-clinical-chatbot.git
-   cd medibert-clinical-chatbot
+   git clone https://github.com/fallss/nlp-medical-consultation-bert.git
+   cd nlp-medical-consultation-bert
    ```
 
 2. **Buat dan aktifkan virtual environment (opsional namun disarankan):**

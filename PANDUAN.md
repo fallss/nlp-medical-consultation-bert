@@ -169,7 +169,7 @@ Sistem MediBERT mengklasifikasikan pertanyaan pasien ke dalam 12 domain klinis:
 5. **Hubungkan ke Repositori Remote GitHub Anda:**
    ```bash
    git branch -M main
-   git remote add origin https://github.com/USERNAME-ANDA/medibert-clinical-chatbot.git
+   git remote add origin https://github.com/fallss/nlp-medical-consultation-bert.git
    ```
 
 6. **Push ke GitHub:**
